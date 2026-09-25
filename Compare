@@ -1,0 +1,16 @@
+
+from pyspark.sql import functions as F
+
+m = F.col("operationMetrics")
+for t in ["cdnseg_consolidated_customer", "cdnseg_single_view_customer"]:
+    print(t)
+    display(
+        spark.sql(f"DESCRIBE HISTORY ops_plab_catalog.mdm_hub.{t}")
+             .filter("userName = 'bhatrna@mfcgd.com' AND operation = 'MERGE'")
+             .select("version", "timestamp",
+                     m["numSourceRows"].alias("source_rows"),
+                     m["numTargetRowsInserted"].alias("inserted"),
+                     m["numTargetRowsUpdated"].alias("updated"),
+                     m["numTargetRowsDeleted"].alias("deleted"))
+             .orderBy("version")
+    )
