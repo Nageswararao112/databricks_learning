@@ -14,3 +14,11 @@ for t in ["cdnseg_consolidated_customer", "cdnseg_single_view_customer"]:
                      m["numTargetRowsDeleted"].alias("deleted"))
              .orderBy("version")
     )
+
+
+SELECT
+  (SELECT count(*) FROM ops_plab_catalog.mdm_hub.cdnseg_consolidated_customer) AS consolidated_total,
+  (SELECT count(*) FROM ops_plab_catalog.mdm_hub.cdnseg_single_view_customer)  AS single_view_total,
+  (SELECT count(*) FROM ops_plab_catalog.mdm_hub.cdnseg_consolidated_customer c
+     LEFT ANTI JOIN ops_plab_catalog.mdm_hub.cdnseg_single_view_customer s
+     ON c.mdm_customer_id = s.mdm_customer_id)                                  AS only_in_consolidated;
