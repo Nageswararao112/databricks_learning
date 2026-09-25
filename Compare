@@ -28,3 +28,19 @@ DELETE FROM ops_plab_catalog.mdm_hub.cdnseg_consolidated_customer
 WHERE mdm_customer_id IN (SELECT mdm_customer_id FROM only_in_cc);
 
 
+CREATE OR REPLACE TEMP VIEW only_in_cc AS
+SELECT c.mdm_customer_id
+FROM ops_plab_catalog.mdm_hub.cdnseg_consolidated_customer c
+LEFT ANTI JOIN ops_plab_catalog.mdm_hub.cdnseg_single_view_customer s
+ON c.mdm_customer_id = s.mdm_customer_id;
+
+CREATE OR REPLACE TEMP VIEW sv_deleted_791 AS
+SELECT DISTINCT mdm_customer_id
+FROM table_changes('ops_plab_catalog.mdm_hub.cdnseg_single_view_customer', 791, 791)
+WHERE _change_type = 'delete';
+
+SELECT count(*) AS overlap
+FROM only_in_cc JOIN sv_deleted_791 USING (mdm_customer_id);
+
+
+
